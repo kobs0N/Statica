@@ -2,11 +2,9 @@
 # Version 0.01 - Only Alpha
 
 # Imports
-import sys
-import time
-import Helper
+import sys, time
 from Core import Scanner
-from DomXSS import detect_dom_xss
+import Helper, DomXSS, Url
 
 
 # Main function that will preform the search in files
@@ -15,10 +13,22 @@ def search_for_weakness(filename):
     lines = [line.rstrip('\n') for line in open(filename)]
 
     for line in lines:
-        result = detect_dom_xss(filename, line)
+        result = DomXSS.detect_dom_xss(filename, line)
         if result is True:
-            hits_amount.add()
-    return hits_amount.value()
+            DomXSS.OverallXssFiles.add()
+
+        result = Url.detect_url(filename, line)
+        if result is True:
+            Url.OverallUrlFiles.add()
+
+
+# Printer
+def print_summary():
+    print "Found " + DomXSS.OverallXssAmount.string() + " Hits In " + \
+          DomXSS.OverallXssFiles.string() + " Files With domXSS Potential"
+    print "Found " + Url.OverallUrlAmount.string() + " Urls In " + \
+          Url.OverallUrlFiles.string() + " Files With External Urls"
+    print "Found overall: " + Helper.overall_issues_amount.string() + " Issues"
 
 
 # Main function
@@ -35,17 +45,13 @@ def main():
     # Set Up Counters
     file_finished = Helper.Counter()
     file_with_xss = Helper.Counter()
-    overall_hits = Helper.Counter()
     time.sleep(1)
 
     for file_name in files_to_scan:
-        hits_amount = search_for_weakness(file_name)
-        overall_hits.add(hits_amount)
-        if hits_amount != 0:
-            file_with_xss.add()
+        search_for_weakness(file_name)
         file_finished.add()
 
-    print "Found " + overall_hits.string() + " Hits In " + file_with_xss.string() + " Files With domXSS Potential"
+    print_summary()
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,8 @@
 import Helper
 
 SuspiciousFunctions = [".innerHTML", ".outerHTML", "document.write", "document.writeln", "eval(", ".html"]
-
+OverallXssAmount = Helper.Counter()
+OverallXssFiles = Helper.Counter()
 
 def detect_dom_xss(filename, line):
     for func in SuspiciousFunctions:
@@ -19,8 +20,9 @@ def detect_dom_xss(filename, line):
                 if only_quotes_funcs(func, line) is False:
                     return False
 
-                Helper.overall_hits_amount.add()
-                print "(" + Helper.overall_hits_amount.string() + " - XSS) " + filename + "(" + func + ") : " + line
+                OverallXssAmount.add()
+                Helper.overall_issues_amount.add()
+                print "(" + Helper.overall_issues_amount.string() + " - XSS) " + filename + "(" + func + ") : " + line
                 return True
             except ValueError:
                 pass
@@ -28,7 +30,7 @@ def detect_dom_xss(filename, line):
 
 
 def only_quotes_verbs(func, line):
-    if (cmp(func,".outerHTML") and cmp(func,".innerHTML")):
+    if cmp(func,".outerHTML") is False and cmp(func,".innerHTML") is False:
         return True
     line = line[line.index("=") + 1:]
     for char in line:
@@ -56,7 +58,7 @@ def only_quotes_verbs(func, line):
 
 
 def only_quotes_funcs(func, line):
-    if (cmp(func,"document.write") and cmp(func,".html")):
+    if cmp(func,"document.write") is False and cmp(func,".html") is False and cmp(func, "eval(") is False:
             return True
 
     if (".html#" in line): return False

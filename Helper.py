@@ -3,7 +3,7 @@ class Counter:
         self.count = 0
 
     def add(self, value=1):
-        self.count += value
+        self.count = self.count + value
 
     def string(self):
         return str(self.count)
@@ -15,4 +15,4 @@ class Counter:
         self.count = 0
 
 # Globals
-overall_hits_amount = Counter()
+overall_issues_amount = Counter()
