@@ -1,5 +1,10 @@
+# Build by Idan Cohen
+# Version 0.01 - Only Alpha
+
+# Imports
 import sys
 import time
+import Helper
 from Core import Scanner
 from DomXSS import Search as XSS_Search
 
@@ -10,19 +15,19 @@ def Main():
 
     mainScanner = Scanner(sys.argv[1])
     filesToScan = mainScanner.FileLists
-    fileAmount = mainScanner.FileFounds
-    fileFinished = 0
-    fileWithXss = 0
-    overallHits = 0
+    
+    fileFinished = Helper.Counter()
+    fileWithXss = Helper.Counter()
+    overallHits = Helper.Counter()
     time.sleep(1)
     for file in filesToScan:
         hits = XSS_Search(file)
         if (hits != 0):
-            fileWithXss = fileWithXss + 1
-            overallHits = overallHits + hits
-        fileFinished = fileFinished + 1
+            fileWithXss.Add()
+            overallHits.Add(hits)
+        fileFinished.Add()
 
-    print "Found " + str(overallHits) + " Hits In " + str(fileWithXss) + " Files With XSS Potential"
+    print "Found " + overallHits.String() + " Hits In " + fileWithXss.String() + " Files With domXSS Potential"
 
 Main()
 	

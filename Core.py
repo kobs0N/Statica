@@ -1,5 +1,7 @@
 import sys
 import os
+import Helper
+
 
 class Scanner:
     AllowFileType = ["html", "html", "js"]
@@ -10,8 +12,8 @@ class Scanner:
             sys.exit(0)
 
         self.FileLists = []
-        self.FileScanned = 0
-        self.FileFounds = 0
+        self.FileScanned = Helper.Counter()
+        self.FileFounds = Helper.Counter()
         self.Path = path
 
         print "Starting Scan Of Folder: " + path
@@ -20,7 +22,7 @@ class Scanner:
         try:
             fileList = os.listdir(path)
             for file in fileList:
-                self.FileScanned = self.FileScanned + 1
+                self.FileScanned.Add()
                 filePath = path + "\\" + file
                 if os.path.isdir(filePath):
                     self.Scan(filePath)
@@ -29,11 +31,11 @@ class Scanner:
                 if (len(spliter) < 2): continue
                 Ext = spliter[1]
                 if Ext in Scanner.AllowFileType:
-                    self.FileFounds = self.FileFounds + 1
+                    self.FileFounds.Add()
                     self.FileLists.append(filePath)
         except WindowsError:
             return
 
         if (self.Path == path):
-            print "Scanned " + str(self.FileScanned) + " Files - Found " + str(self.FileFounds) + " Intersting Files"
+            print "Scanned " + self.FileScanned.String() + " Files - Found " + self.FileFounds.String() + " Intersting Files"
 	
