@@ -16,6 +16,7 @@ def Search(filename):
                     if (length == 0): continue
                     if (len(func) + 1 == length): continue
                     if onlyQuotesVerbs(func, line) == False: continue
+                    if onlyQuotesFuncs(func, line) == False: continue
 
                     hitsAmount = hitsAmount + 1
                     overallHitsAmount = overallHitsAmount + 1
@@ -50,4 +51,35 @@ def onlyQuotesVerbs(func, line):
             return True
 
     return False
+def onlyQuotesFuncs(func, line):
+    if (cmp(func,"document.write") and cmp(func,".html(")):
+            return True
+    line = line[line.index(func) + len(func):]
+    for char in line:
+        if char == ' ':
+            continue
+        if char == '(':
+            continue
+        elif char == '\"':
+            break
+        elif char == '\'':
+            break
+        else:
+            return True
+    for c in reversed(line):
+        if char == ';':
+            continue
+        elif char == ' ':
+            continue
+        elif char == ')':
+            continue
+        elif char == '\"':
+            break
+        elif char == '\'':
+            break
+        else:
+            return True
+
+    return False
+
 
