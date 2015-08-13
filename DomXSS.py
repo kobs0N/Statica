@@ -3,7 +3,7 @@ overallHitsAmount = 0
 def Search(filename):
     global overallHitsAmount
     hitsAmount = 0
-    SuspiciousFunctions = [".innerHTML", ".outerHTML", "document.write", "document.writeln", "eval(", ".html("]
+    SuspiciousFunctions = [".innerHTML", ".outerHTML", "document.write", "document.writeln", "eval(", ".html"]
     lines = [line.rstrip('\n') for line in open(filename)]
 
     for line in lines:
@@ -52,9 +52,12 @@ def onlyQuotesVerbs(func, line):
 
     return False
 def onlyQuotesFuncs(func, line):
-    if (cmp(func,"document.write") and cmp(func,".html(")):
+    if (cmp(func,"document.write") and cmp(func,".html")):
             return True
-    line = line[line.index(func) + len(func):]
+
+    if (".html#" in line): return False
+
+    line = line[line.index(func) + len(func):line.index(";")]
     for char in line:
         if char == ' ':
             continue
@@ -63,6 +66,8 @@ def onlyQuotesFuncs(func, line):
         elif char == '\"':
             break
         elif char == '\'':
+            break
+        elif char == ')':
             break
         else:
             return True
@@ -73,6 +78,8 @@ def onlyQuotesFuncs(func, line):
             continue
         elif char == ')':
             continue
+        elif char == '(':
+            break
         elif char == '\"':
             break
         elif char == '\'':

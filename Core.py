@@ -4,7 +4,8 @@ import Helper
 
 
 class Scanner:
-    AllowFileType = ["html", "html", "js"]
+    AllowFileType = ["html", "htm", "js"]
+    AllowFilesName = ["jquery"]
 
     def __init__(self, path):
         if os.path.isdir(path) == False:
@@ -16,7 +17,7 @@ class Scanner:
         self.FileFounds = Helper.Counter()
         self.Path = path
 
-        print "Starting Scan Of Folder: " + path
+        print "Starting Scan of Folder: " + path
         self.Scan(path)
     def Scan(self, path):
         try:
@@ -27,9 +28,17 @@ class Scanner:
                 if os.path.isdir(filePath):
                     self.Scan(filePath)
                     continue
+
+                isAllowed = True
+                for allowed in Scanner.AllowFilesName:
+                    if (allowed in file):
+                        isAllowed = False
+                        break
+                if (isAllowed == False): continue
+
                 spliter = filePath.split(".")
                 if (len(spliter) < 2): continue
-                Ext = spliter[1]
+                Ext = spliter[len(spliter) - 1]
                 if Ext in Scanner.AllowFileType:
                     self.FileFounds.Add()
                     self.FileLists.append(filePath)
