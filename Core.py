@@ -8,7 +8,7 @@ class Scanner:
     AllowFilesName = ["jquery"]
 
     def __init__(self, path):
-        if os.path.isdir(path) == False:
+        if os.path.isdir(path) is False:
             print "Wrong Argument"
             sys.exit(0)
 
@@ -18,33 +18,34 @@ class Scanner:
         self.Path = path
 
         print "Starting Scan of Folder: " + path
-        self.Scan(path)
-    def Scan(self, path):
+        self.scan(path)
+
+    def scan(self, path):
         try:
-            fileList = os.listdir(path)
-            for file in fileList:
-                self.FileScanned.Add()
-                filePath = path + "\\" + file
-                if os.path.isdir(filePath):
-                    self.Scan(filePath)
+            file_list = os.listdir(path)
+            for file_name in file_list:
+                self.FileScanned.add()
+                file_path = path + "\\" + file_name
+                if os.path.isdir(file_path):
+                    self.scan(file_path)
                     continue
 
-                isAllowed = True
+                is_allowed = True
                 for allowed in Scanner.AllowFilesName:
-                    if (allowed in file):
-                        isAllowed = False
+                    if allowed in file_name:
+                        is_allowed = False
                         break
-                if (isAllowed == False): continue
+                if is_allowed is False: continue
 
-                spliter = filePath.split(".")
-                if (len(spliter) < 2): continue
-                Ext = spliter[len(spliter) - 1]
-                if Ext in Scanner.AllowFileType:
-                    self.FileFounds.Add()
-                    self.FileLists.append(filePath)
+                split_point = file_path.split(".")
+                if len(split_point) < 2: continue
+                ext = split_point[len(split_point) - 1]
+                if ext in Scanner.AllowFileType:
+                    self.FileFounds.add()
+                    self.FileLists.append(file_path)
         except WindowsError:
             return
 
-        if (self.Path == path):
-            print "Scanned " + self.FileScanned.String() + " Files - Found " + self.FileFounds.String() + " Intersting Files"
-	
+        if self.Path == path:
+            print "Scanned " + self.FileScanned.string() + " Files - Found " + \
+                  self.FileFounds.string() + " Interesting Files"

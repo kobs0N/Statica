@@ -1,31 +1,33 @@
-overallHitsAmount = 0
+import Helper
 
-def Search(filename):
-    global overallHitsAmount
-    hitsAmount = 0
-    SuspiciousFunctions = [".innerHTML", ".outerHTML", "document.write", "document.writeln", "eval(", ".html"]
-    lines = [line.rstrip('\n') for line in open(filename)]
+SuspiciousFunctions = [".innerHTML", ".outerHTML", "document.write", "document.writeln", "eval(", ".html"]
 
-    for line in lines:
-        for func in SuspiciousFunctions:
-            if func in line:
-                try:
-                    line = line[line.index(func):line.index(';')+1]
-                    length = len(line)
 
-                    if (length == 0): continue
-                    if (len(func) + 1 == length): continue
-                    if onlyQuotesVerbs(func, line) == False: continue
-                    if onlyQuotesFuncs(func, line) == False: continue
+def detect_dom_xss(filename, line):
+    for func in SuspiciousFunctions:
+        if func in line:
+            try:
+                line = line[line.index(func):line.index(';')+1]
+                length = len(line)
 
-                    hitsAmount = hitsAmount + 1
-                    overallHitsAmount = overallHitsAmount + 1
-                    print "(" + str(overallHitsAmount) + ") " + filename + "(" + func + ") : " + line
-                except ValueError:
-                    pass
-    return hitsAmount
+                if length is 0:
+                    return False
+                if len(func) + 1 is length:
+                    return False
+                if only_quotes_verbs(func, line) is False:
+                    return False
+                if only_quotes_funcs(func, line) is False:
+                    return False
 
-def onlyQuotesVerbs(func, line):
+                Helper.overall_hits_amount.add()
+                print "(" + Helper.overall_hits_amount.string() + " - XSS) " + filename + "(" + func + ") : " + line
+                return True
+            except ValueError:
+                pass
+    return False
+
+
+def only_quotes_verbs(func, line):
     if (cmp(func,".outerHTML") and cmp(func,".innerHTML")):
         return True
     line = line[line.index("=") + 1:]
@@ -51,7 +53,9 @@ def onlyQuotesVerbs(func, line):
             return True
 
     return False
-def onlyQuotesFuncs(func, line):
+
+
+def only_quotes_funcs(func, line):
     if (cmp(func,"document.write") and cmp(func,".html")):
             return True
 
