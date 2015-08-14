@@ -4,7 +4,8 @@ SuspiciousFunctions = [".innerHTML", ".outerHTML", "document.write", "document.w
 OverallXssAmount = Helper.Counter()
 OverallXssFiles = Helper.Counter()
 
-def detect_dom_xss(filename, line):
+
+def detect_dom_xss(filename, line, num):
     for func in SuspiciousFunctions:
         if func in line:
             try:
@@ -22,7 +23,12 @@ def detect_dom_xss(filename, line):
 
                 OverallXssAmount.add()
                 Helper.overall_issues_amount.add()
-                print "(" + Helper.overall_issues_amount.string() + " - XSS) " + filename + "(" + func + ") : " + line
+
+                if len(line) > Helper.MAX_LINE:
+                    line = Helper.MAX_TEXT + str(num.value())
+
+                Helper.print_single_issue(Helper.overall_issues_amount.string(), "XSS", filename,
+                                              num, line, func)
                 return True
             except ValueError:
                 pass

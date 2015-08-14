@@ -3,7 +3,7 @@
 
 # Imports
 import sys, time
-from Core import Scanner
+from Scanner import Scanner
 import Helper, DomXSS, Url
 
 
@@ -12,19 +12,21 @@ def search_for_weakness(filename):
     hits_amount = Helper.Counter()
     lines = [line.rstrip('\n') for line in open(filename)]
 
+    num_of_lines = Helper.Counter()
     for line in lines:
-        result = DomXSS.detect_dom_xss(filename, line)
+        num_of_lines.add()
+        result = DomXSS.detect_dom_xss(filename, line, num_of_lines)
         if result is True:
             DomXSS.OverallXssFiles.add()
 
-        result = Url.detect_url(filename, line)
+        result = Url.detect_url(filename, line, num_of_lines)
         if result is True:
             Url.OverallUrlFiles.add()
 
 
 # Printer
 def print_summary():
-    print "Found " + DomXSS.OverallXssAmount.string() + " Hits In " + \
+    print "\nFound " + DomXSS.OverallXssAmount.string() + " Hits In " + \
           DomXSS.OverallXssFiles.string() + " Files With domXSS Potential"
     print "Found " + Url.OverallUrlAmount.string() + " Urls In " + \
           Url.OverallUrlFiles.string() + " Files With External Urls"
@@ -35,7 +37,7 @@ def print_summary():
 def main():
     # Arguments Care
     if len(sys.argv) != 2:
-        print "Missing Argument: Statica.exe Folder"
+        print "Missing Argument: Statica.py folder_name"
         sys.exit(0)
 
     # Get Suspicious File List

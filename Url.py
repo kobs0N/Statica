@@ -5,7 +5,7 @@ OverallUrlAmount = Helper.Counter()
 OverallUrlFiles = Helper.Counter()
 
 
-def detect_url(filename, line):
+def detect_url(filename, line, num):
     if "src=" in line:
         if only_external_scripts(line) is False:
             return False
@@ -20,7 +20,11 @@ def detect_url(filename, line):
         OverallUrlAmount.add()
         Helper.overall_issues_amount.add()
 
-        print "(" + Helper.overall_issues_amount.string() + " - URL) " + filename + " : " + line
+        if len(line) > Helper.MAX_LINE:
+            line = Helper.MAX_TEXT
+
+        Helper.print_single_issue(Helper.overall_issues_amount.string(), "URL", filename,
+                                num, line, "")
         return True
 
     # line = line[line.index(func):line.index(';')+1]
