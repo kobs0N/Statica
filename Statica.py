@@ -10,7 +10,6 @@ from Threat import Url, Xss
 
 # Main function that will preform the search in files
 def search_for_threats(filename):
-    hits_amount = Helper.Counter()
     lines = [line.rstrip('\n') for line in open(filename)]
 
     num_of_lines = Helper.Counter()
