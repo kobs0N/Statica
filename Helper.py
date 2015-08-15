@@ -16,13 +16,6 @@ class Counter:
         self.count = 0
 
 
-# Helper Functions
-
-
-# Globals
-
-
 # Consts
 MAX_LINE = 200
-PADDING = 3
 MAX_TEXT = "Long Line"
