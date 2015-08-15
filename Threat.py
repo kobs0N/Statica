@@ -3,31 +3,48 @@ import Helper
 from Helper import Counter
 
 
-# Threats Functions
-def print_single_issue(overall, type, filename, num, line, func = ""):
-    print "(" + overall + " - " + type + " [" + func + "]) " + filename + " (line " + num.string() + "): " + line
+# Threats Functions & Verbs
+def print_single_issue(overall, threat_type, filename, num, line, func=""):
+    print "(" + overall + " - " + threat_type + " [" + func + "]) " + filename + " (line " + num.string() + "): " + line
 
+OverallIssuesAmount = Counter()
+overallFilesAmount = Counter()
+FoundFile = False
+
+
+def count_files():
+    global FoundFile
+    if FoundFile is True:
+        overallFilesAmount.add()
+        FoundFile = False
 
 # Base Abstract Class
 class Base(object):
-    __metaclass__  = abc.ABCMeta
-
-    OverallAmount = Counter()
-    OverallFiles = Counter()
+    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def detect(filename, line, num):
-         """
+        """
          :param The name of the tested File
          :param The content of the line
          :param The line number
          :return True - Found, False - Not Found
          """
 
+    def count_files(self):
+        """
+        :return:
+        """
+
 
 # Virtual Classes
 class Url(Base):
     allow_included_files = ["/wp_", "/wp-"]
+
+    # Need to fix it
+    OverallAmount = Counter()
+    FoundFile = False
+    OverallFiles = Counter()
 
     @staticmethod
     def detect(filename, line, num):
@@ -43,15 +60,21 @@ class Url(Base):
                     return False
 
             Url.OverallAmount.add()
-            Helper.OverallIssuesAmount.add()
+            OverallIssuesAmount.add()
 
             if len(line) > Helper.MAX_LINE:
                 line = Helper.MAX_TEXT
 
-            print_single_issue(Helper.OverallIssuesAmount.string(), "URL", filename, num, line, "")
+            print_single_issue(OverallIssuesAmount.string(), "URL", filename, num, line, "")
             return True
 
-        # line = line[line.index(func):line.index(';')+1]
+    @staticmethod
+    def count_files():
+        global FoundFile
+        if Url.FoundFile is True:
+            Url.OverallFiles.add()
+            Url.FoundFile = False
+            FoundFile = True
 
     @staticmethod
     def only_external_scripts(line):
@@ -71,14 +94,19 @@ class Url(Base):
 
 
 class Xss(Base):
-    SuspiciousFunctions = [".innerHTML", ".outerHTML", "document.write", "document.writeln", "eval(", ".html"]
+    SuspiciousFunctions = [".innerhtml", ".outerhtml", "document.write", "document.writeln", "eval(", ".html"]
+
+    # Need to fix it
+    OverallAmount = Counter()
+    FoundFile = False
+    OverallFiles = Counter()
 
     @staticmethod
     def detect(filename, line, num):
         for func in Xss.SuspiciousFunctions:
             if func in line:
                 try:
-                    line = line[line.index(func):line.index(';')+1]
+                    line = line[line.index(func):line.index(';') + 1]
                     length = len(line)
 
                     if length is 0:
@@ -91,20 +119,28 @@ class Xss(Base):
                         return False
 
                     Xss.OverallAmount.add()
-                    Helper.OverallIssuesAmount.add()
+                    OverallIssuesAmount.add()
 
                     if len(line) > Helper.MAX_LINE:
                         line = Helper.MAX_TEXT + str(num.value())
 
-                    print_single_issue(Helper.OverallIssuesAmount.string(), "XSS", filename, num, line, func)
+                    print_single_issue(OverallIssuesAmount.string(), "XSS", filename, num, line, func)
                     return True
                 except ValueError:
                     pass
         return False
 
     @staticmethod
+    def count_files():
+        global FoundFile
+        if Xss.FoundFile is True:
+            Xss.OverallFiles.add()
+            Xss.FoundFile = False
+            FoundFile = True
+
+    @staticmethod
     def only_quotes_verbs(func, line):
-        if cmp(func,".outerHTML") is False and cmp(func,".innerHTML") is False:
+        if cmp(func, ".outerHTML") is False and cmp(func, ".innerHTML") is False:
             return True
         line = line[line.index("=") + 1:]
         for char in line:
@@ -132,10 +168,11 @@ class Xss(Base):
 
     @staticmethod
     def only_quotes_funcs(func, line):
-        if cmp(func,"document.write") is False and cmp(func,".html") is False and cmp(func, "eval(") is False:
-                return True
+        if cmp(func, "document.write") is False and cmp(func, ".html") is False and cmp(func, "eval(") is False:
+            return True
 
-        if (".html#" in line): return False
+        if ".html#" in line:
+            return False
 
         line = line[line.index(func) + len(func):line.index(";")]
         for char in line:

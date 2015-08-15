@@ -3,7 +3,7 @@
 
 # Imports
 import sys, time
-import Helper
+import Helper, Threat
 from Scanner import Scanner
 from Threat import Url, Xss
 
@@ -15,13 +15,17 @@ def search_for_threats(filename):
     num_of_lines = Helper.Counter()
     for line in lines:
         num_of_lines.add()
-        result = Xss.detect(filename, line, num_of_lines)
+        result = Xss.detect(filename, line.lower(), num_of_lines)
         if result is True:
-            Xss.OverallFiles.add()
+            Xss.FoundFile = True
 
-        result = Url.detect(filename, line, num_of_lines)
+        result = Url.detect(filename, line.lower(), num_of_lines)
         if result is True:
-            Url.OverallFiles.add()
+            Url.FoundFile = True
+
+    Xss.count_files()
+    Url.count_files()
+    Threat.count_files()
 
 
 # Printer
@@ -30,7 +34,7 @@ def print_summary():
           Xss.OverallFiles.string() + " Files With domXSS Potential"
     print "Found " + Url.OverallAmount.string() + " Urls In " + \
           Url.OverallFiles.string() + " Files With External Urls"
-    print "Found overall: " + Helper.OverallIssuesAmount.string() + " Issues"
+    print "Found overall: " + Threat.OverallIssuesAmount.string() + " Issues" + " In " + Threat.overallFilesAmount.string() + " Files"
 
 
 # Main function

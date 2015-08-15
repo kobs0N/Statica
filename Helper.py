@@ -4,7 +4,7 @@ class Counter:
         self.count = 0
 
     def add(self, value=1):
-        self.count = self.count + value
+        self.count += value
 
     def string(self):
         return str(self.count)
@@ -20,8 +20,9 @@ class Counter:
 
 
 # Globals
-OverallIssuesAmount = Counter()
+
 
 # Consts
-MAX_LINE = 100
+MAX_LINE = 200
+PADDING = 3
 MAX_TEXT = "Long Line"
