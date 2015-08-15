@@ -3,34 +3,35 @@
 
 # Imports
 import sys, time
+import Helper
 from Scanner import Scanner
-import Helper, DomXSS, Url
+from Threat import Url, Xss
 
 
 # Main function that will preform the search in files
-def search_for_weakness(filename):
+def search_for_threats(filename):
     hits_amount = Helper.Counter()
     lines = [line.rstrip('\n') for line in open(filename)]
 
     num_of_lines = Helper.Counter()
     for line in lines:
         num_of_lines.add()
-        result = DomXSS.detect_dom_xss(filename, line, num_of_lines)
+        result = Xss.detect(filename, line, num_of_lines)
         if result is True:
-            DomXSS.OverallXssFiles.add()
+            Xss.OverallFiles.add()
 
-        result = Url.detect_url(filename, line, num_of_lines)
+        result = Url.detect(filename, line, num_of_lines)
         if result is True:
-            Url.OverallUrlFiles.add()
+            Url.OverallFiles.add()
 
 
 # Printer
 def print_summary():
-    print "\nFound " + DomXSS.OverallXssAmount.string() + " Hits In " + \
-          DomXSS.OverallXssFiles.string() + " Files With domXSS Potential"
-    print "Found " + Url.OverallUrlAmount.string() + " Urls In " + \
-          Url.OverallUrlFiles.string() + " Files With External Urls"
-    print "Found overall: " + Helper.overall_issues_amount.string() + " Issues"
+    print "\nFound " + Xss.OverallAmount.string() + " Hits In " + \
+          Xss.OverallFiles.string() + " Files With domXSS Potential"
+    print "Found " + Url.OverallAmount.string() + " Urls In " + \
+          Url.OverallFiles.string() + " Files With External Urls"
+    print "Found overall: " + Helper.OverallIssuesAmount.string() + " Issues"
 
 
 # Main function
@@ -46,11 +47,10 @@ def main():
 
     # Set Up Counters
     file_finished = Helper.Counter()
-    file_with_xss = Helper.Counter()
     time.sleep(1)
 
     for file_name in files_to_scan:
-        search_for_weakness(file_name)
+        search_for_threats(file_name)
         file_finished.add()
 
     print_summary()

@@ -17,13 +17,11 @@ class Counter:
 
 
 # Helper Functions
-def print_single_issue(overall, type, filename, num, line, func = ""):
-    print "(" + overall + " - " + type + " [" + func + "]) " + filename + " (line " + num.string() + "): " + line
 
 
 # Globals
-overall_issues_amount = Counter()
+OverallIssuesAmount = Counter()
 
 # Consts
 MAX_LINE = 100
-MAX_TEXT = "Long Line - Go To Line: "
+MAX_TEXT = "Long Line"
