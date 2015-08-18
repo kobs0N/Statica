@@ -5,7 +5,9 @@ from Helper import Counter
 
 # Threats Functions & Verbs
 def print_single_issue(overall, threat_type, filename, num, line, func=""):
-    print "(" + overall + " - " + threat_type + " [" + func + "]) " + filename + " (line " + num.string() + "): " + line
+    text = "(" + overall + " - " + threat_type + " [" + func + "]) " + filename + " (line " + num.string() + "): " + line
+    print text
+    Helper.FileHandler.save(text + "\n")
 
 OverallIssuesAmount = Counter()
 overallFilesAmount = Counter()
