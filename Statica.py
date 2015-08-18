@@ -4,8 +4,10 @@
 # Imports
 import sys, time
 import Helper, Threat
+from datetime import datetime
 from Scanner import Scanner
 from Threat import Url, Xss
+from multiprocessing.dummy import Pool as ThreadPool
 
 
 # Main function that will preform the search in files
@@ -29,17 +31,21 @@ def search_for_threats(filename):
 
 
 # Printer
-def print_summary():
+def print_summary(TimeStarted):
+    TimeStarted = datetime.now() - TimeStarted
     print "\nFound " + Xss.OverallAmount.string() + " Hits In " + \
           Xss.OverallFiles.string() + " Files With domXSS Potential"
     print "Found " + Url.OverallAmount.string() + " Urls In " + \
           Url.OverallFiles.string() + " Files With External Urls"
-    print "Found overall: " + Threat.OverallIssuesAmount.string() + " Issues" + " In " + Threat.overallFilesAmount.string() + " Files"
+    print "Found overall: " + Threat.OverallIssuesAmount.string() + " Issues In " \
+          + Threat.overallFilesAmount.string() + " Files" \
+          + "(" + str(TimeStarted)+ ")\n"
 
 
 # Main function
 def main():
     # Arguments Care
+    Threads = ThreadPool(10)
     if len(sys.argv) != 2:
         print "Missing Argument: Statica.py folder_name"
         sys.exit(0)
@@ -52,11 +58,12 @@ def main():
     file_finished = Helper.Counter()
     time.sleep(1)
 
+    TimeStarted = datetime.now()
     for file_name in files_to_scan:
-        search_for_threats(file_name)
+        Threads.map(search_for_threats,(file_name,))
         file_finished.add()
 
-    print_summary()
+    print_summary(TimeStarted)
 
 if __name__ == "__main__":
     main()

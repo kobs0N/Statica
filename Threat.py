@@ -122,7 +122,7 @@ class Xss(Base):
                     OverallIssuesAmount.add()
 
                     if len(line) > Helper.MAX_LINE:
-                        line = Helper.MAX_TEXT + str(num.value())
+                        line = Helper.MAX_TEXT
 
                     print_single_issue(OverallIssuesAmount.string(), "XSS", filename, num, line, func)
                     return True
