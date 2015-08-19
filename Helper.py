@@ -25,6 +25,24 @@ class Counter:
         self.count = 0
 
 
+# Taking care of the process bar - Percent
+# We have to increase it every time we scan a file
+class Percent:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.countAll = 1
+        self.countCurrent = 0
+
+    def increase(self):
+        self.lock.acquire()
+        self.countCurrent += 1
+        self.lock.release()
+
+    def percent(self):  # The percent itself
+        res = (float(self.countCurrent) / self.countAll) * 100
+        return "%.2f" % res     # Two decimal places after the point
+
+
 class StoreFile:
     def __init__(self, path):
         self.file_path = path
@@ -44,7 +62,7 @@ class StoreFile:
             self._file.close()
 
 # Consts
-MAX_LINE = 200
+MAX_LINE = 250
 MAX_TEXT = "Long Line"
 
 # Globals

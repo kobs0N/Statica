@@ -1,11 +1,20 @@
 import abc
 import Helper
-from Helper import Counter
+from Helper import Counter,Percent
 
+# Globals
+per = Helper.Percent()
 
 # Threats Functions & Verbs
 def print_single_issue(overall, threat_type, filename, num, line, func=""):
-    text = "(" + overall + " - " + threat_type + " [" + func + "]) " + filename + " (line " + num.string() + "): " + line
+    line1 = line[:110]
+    line2 = line[110:]
+    if len(line2) > 0:
+        text = "(" + overall + " @ " + str(per.percent()) + "% - " + threat_type + " [" + func + "]) " + filename \
+               + " (line " + num.string() + "): " + "\n       " + line1 + "\n       " + line2
+    else:
+                text = "(" + overall + " @ " + str(per.percent()) + "% - " + threat_type + " [" + func + "]) " + filename \
+               + " (line " + num.string() + "): " + "\n       " + line1
     print text
     Helper.FileHandler.save(text + "\n")
 
