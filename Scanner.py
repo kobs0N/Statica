@@ -8,7 +8,7 @@ class Scanner:
     AllowFileType = ["html", "htm", "js"]
     AllowFilesName = ["jquery"]
     TimeStarted = datetime.now()
-#
+
     FileScanned = Helper.Counter()
     FileFounds = Helper.Counter()
     FileLists = []
