@@ -1,5 +1,6 @@
-# Build by Idan Cohen
-# Version 0.01 - Only Alpha
+# Build by Idan Cohen (Odahviing)
+# Contributors: Roei Jacobovich
+# Version 0.1
 
 # Imports
 import platform, os
@@ -59,6 +60,7 @@ def Menu():
         sys.exit(2)
 
     return options
+
 
 def GraphicInit():
     print "\n"

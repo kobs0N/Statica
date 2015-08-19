@@ -15,15 +15,19 @@ class Scanner:
     Threads = ThreadPool() # We have support in multithread but its seems even slower
 
     def __init__(self, path):
-        if os.path.isdir(path) is False:
-            print "Wrong Argument"
-            sys.exit(0)
+        self.OnlyOneFile = True if os.path.isdir(path) is False else False
+        text_added = "Folder" if self.OnlyOneFile is False else "File"
 
         self.Path = path
+        time_started = datetime.now()
 
-        TimeStarted = datetime.now()
-        print "Starting Scan of Folder: " + path + " at: " + Helper.ToTime(TimeStarted)
-        self.scan(path, False)
+        print "Starting Scan of " + text_added + ": " + path + " at: " + Helper.ToTime(time_started)
+
+        if self.OnlyOneFile is True:
+            Scanner.FileFounds.add()
+            Scanner.FileLists.append(path)
+        else:
+            self.scan(path, False)
 
     def scan(self, path, top = False):
         try:

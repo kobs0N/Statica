@@ -5,18 +5,17 @@ from Helper import Counter,Percent
 # Globals
 per = Helper.Percent()
 
+
 # Threats Functions & Verbs
 def print_single_issue(overall, threat_type, filename, num, line, func=""):
     line1 = line[:110]
     line2 = line[110:]
+    value_to_print = text = "(" + overall + " @ " + str(per.percent()) + "% - " + threat_type + " [" + func + "])\n       " + filename \
+               + " (line " + num.string() + ") " + "\n       " + line1
     if len(line2) > 0:
-        text = "(" + overall + " @ " + str(per.percent()) + "% - " + threat_type + " [" + func + "]) " + filename \
-               + " (line " + num.string() + "): " + "\n       " + line1 + "\n       " + line2
-    else:
-                text = "(" + overall + " @ " + str(per.percent()) + "% - " + threat_type + " [" + func + "]) " + filename \
-               + " (line " + num.string() + "): " + "\n       " + line1
-    print text
-    Helper.FileHandler.save(text + "\n")
+        value_to_print = value_to_print + "\n       " + line2
+    print value_to_print
+    Helper.FileHandler.save(value_to_print + "\n")
 
 OverallIssuesAmount = Counter()
 overallFilesAmount = Counter()
@@ -59,7 +58,7 @@ class Url(Base):
 
     @staticmethod
     def detect(filename, line, num):
-        if "src=" in line:
+        if "src=" in line or "codebase" in line:
             if Url.only_external_scripts(line) is False:
                 return False
 
