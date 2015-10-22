@@ -1,6 +1,6 @@
 # README #
 
-Statica - currently on alpha version 0.1
+Statica - currently on alpha version 0.2
 
 ### What is this repository for? ###
 
@@ -8,9 +8,10 @@ Statica is a tool that make normal static analysis for client side files (html/j
 Instead of manually search for issues, you can do it in one click
 
 There is much more to do, and its only the first version.  
-Version: 0.10
+Version: 0.2
 
-How is working Statica.py path
+Run With:
+Statica.py path
 
 ### Contribution guidelines ###
 
