@@ -215,3 +215,78 @@ class Xss(Base):
                 return True
 
         return False
+
+
+class Comments(Base):
+    longComment = False
+    OverallAmount = Counter()
+    FoundFile = False
+    OverallFiles = Counter()
+
+    @staticmethod
+    def detect(filename, line, num):
+
+        # Check File Ext.
+        index = len(filename) - 1
+        while index:
+            if filename[index] == '\\':
+                break;
+            index = index - 1
+        ext = filename[index:].split('.')[1]
+
+        if "/*" in line:
+            Comments.longComment = True
+            return True
+
+        if "<!--" in line:
+            Comments.longComment = True
+            return True
+
+        if "php" in ext.lower() or "rb" in ext.lower():
+            if "=begin" in line: # Ruby Perl and PHP block comment
+                Comments.longComment = True
+                return True
+
+            if "#" in line: # One-Line Comment, python php ruby and more
+                print filename
+                print line
+                print "\n"
+                Comments.OverallAmount.add()
+                return True
+
+        if Comments.longComment is True: # Continue Long comment as /* or JavaDoc
+            if "*/" in line: # End of the JS long comment
+                Comments.longComment = False
+
+            if "-->" in line: # End of the HTML long comment
+                Comments.longComment = False
+
+            if "=end" in line: # End of the Ruby long comment
+                Comments.longComment = False
+
+            if "=cut" in line: # End of the Perl (PHP support) long comment
+                Comments.longComment = False
+
+            Comments.OverallAmount.add()
+
+            return True
+
+        if "//" in line: # One-Line Comment
+            Comments.OverallAmount.add()
+            return True
+
+        if "log" in line.lower():   # Log, for example Log.i(..) or console.log
+                Comments.OverallAmount.add()
+                return True
+
+        return False
+    @staticmethod
+    def count_files():
+        global FoundFile
+        if Comments.FoundFile is True:
+            Comments.OverallFiles.add()
+            Comments.FoundFile = False
+            FoundFile = True
+
+
+

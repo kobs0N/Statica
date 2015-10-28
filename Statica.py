@@ -9,17 +9,19 @@ import Helper, Threat
 from datetime import datetime
 from Scanner import Scanner
 from optparse import OptionParser
-from Threat import Url, Xss
+from Threat import Url, Xss, Comments
 from multiprocessing.dummy import Pool as ThreadPool
 
 # Globals
 objFile = Helper.StoreFile
 
-
 # Main function that will preform the search in files
 def search_for_threats(filename):
     lines = [line.rstrip('\n') for line in open(filename)]
     Threat.per.increase()
+
+    if cfile is not None:
+        cfile.write("\n***\t"+filename+"\t***\n\n")
 
     num_of_lines = Helper.Counter()
     for line in lines:
@@ -32,8 +34,16 @@ def search_for_threats(filename):
         if result is True:
             Url.FoundFile = True
 
+        if cfile is not "":
+            result = Comments.detect(filename, line.lower(), num_of_lines)
+            Comments.longComment = False # Reset for the next file
+            if result is True and cfile is not None: # result is the number of the line, -1 if False
+                Comments.FoundFile = True
+                cfile.write("@" + str(num_of_lines.value()) + ":\t" + line + "\n")
+
     Xss.count_files()
     Url.count_files()
+    Comments.count_files()
     Threat.count_files()
 
 
@@ -44,7 +54,9 @@ def print_summary(TimeStarted):
           Xss.OverallFiles.string() + " Files With domXSS Potential"
     print "Found " + Url.OverallAmount.string() + " Urls In " + \
           Url.OverallFiles.string() + " Files With External Urls"
-    print "Found overall: " + Threat.OverallIssuesAmount.string() + " Issues In " \
+    print "Found " + Comments.OverallAmount.string() + " Comments In " + \
+          Comments.OverallFiles.string() + " Files With Comments"
+    print "Found overall (Without Comments): " + Threat.OverallIssuesAmount.string() + " Issues In " \
           + Threat.overallFilesAmount.string() + " Files" \
           + " (" + str(TimeStarted)+ ")\n"
 
@@ -53,6 +65,7 @@ def Menu():
     options = OptionParser()
     options.add_option("-f", "--filename", help="Save to file", dest="filename", metavar="FILE")
     options.add_option("-u", "--url", action="store_true", help="Do online static analysis [Future Use]", default=False)
+    options.add_option("-c", "--comments", help="Save all comments into one file", dest="cfilepath")
     (options, args) = options.parse_args()
 
     if options.url is True:
@@ -89,6 +102,11 @@ def main():
     Threads = ThreadPool(10)
     GraphicInit()
     result = Menu()
+    if result.cfilepath is not "":
+        global cfile
+        cfile = open(result.cfilepath, 'w')
+    else:
+        cfile = None
 
     if len(sys.argv) < 2:
         print "Missing Argument: Statica.py folder_name"
@@ -97,7 +115,7 @@ def main():
     Helper.FileHandler = Helper.StoreFile(result.filename)
 
     # Get Suspicious File List
-    main_scanner = Scanner(sys.argv[len(sys.argv) - 1])
+    main_scanner = Scanner(sys.argv[1])
     files_to_scan = main_scanner.FileLists
     Threat.per.countAll = len(files_to_scan)
 
@@ -112,6 +130,9 @@ def main():
 
     print_summary(TimeStarted)
     Helper.FileHandler.close()
+
+    if cfile is not None:
+        cfile.close()
 
 if __name__ == "__main__":
     main()
