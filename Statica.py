@@ -11,6 +11,7 @@ from Scanner import Scanner
 from optparse import OptionParser
 from Threat import Url, Xss, Comments
 from multiprocessing.dummy import Pool as ThreadPool
+import Spider
 
 # Globals
 objFile = Helper.StoreFile
@@ -136,3 +137,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    #Spider.pages_scan("http://www.walla.co.il")
