@@ -17,6 +17,7 @@ pages_list = []
 domain = ""
 counter = 0
 
+
 def pages_scan(url):
     global domain, counter
     domain = get_domain_name(url)
@@ -28,19 +29,20 @@ def pages_scan(url):
 
     print folder + "\\" + domain
     page_downloader(url, folder + "\\" + domain + "\\")
-    print counter
+    print "Found" ,counter
 
 
 def page_downloader(url, location):
     global domain, counter
     print "Working now on ", url
-    counter = counter + 1
+    counter += 1
     pages_list.append(url)
 
     response = ""
     try:
         response = urllib2.urlopen(url)
     except urllib2.HTTPError:
+        print "Http Error"
         return
 
     try:
@@ -50,18 +52,17 @@ def page_downloader(url, location):
         print "Error on ", url
         return
 
-    # Not Efficient Line
-    tmp_url = url[url.index("://") + 3:].replace("/", ".").replace("@", ".").replace("?", ".")
+    tmp_url = remove_chars(url[url.index("://") + 3:])
     fo = open(location + tmp_url, "w")
     fo.write(html)
     fo.close()
-
     places = find_all(html.lower(), "http")
 
     for place in places:
         new_tested_url = html[place:place+70]
 
         if domain == get_domain_name(new_tested_url):
+            # Also fix this
             new_tested_url = secured_index(new_tested_url, " ")
             new_tested_url = secured_index(new_tested_url, "\"")
             new_tested_url = secured_index(new_tested_url, "\'")
@@ -83,25 +84,32 @@ def does_exists(new_url):
 
 def find_all(text, sub):
     result = []
-    k = 0
-    while k < len(text):
-        k = text.find(sub, k)
-        if k == -1:
+    index = 0
+    while index < len(text):
+        index = text.find(sub, index)
+        if index == -1:
             return result
         else:
-            result.append(k)
-            k += 1
+            result.append(index)
+            index += 1
     return result
 
 
+def remove_chars(url):
+    length = len(url)
+    print length
+    index = 0
+    while index < length - 1:
+        if url[index] is '/' or url[index] is '? ' or url[index] is '@':
+            # Need to do some benchmarking
+            url = url[:index - 1] + "." + url[index + 1:]
+        index += 1
+    return url
+
 # Need to make this function better, many true - negative
 def get_domain_name(url):
-    try:
-        url = url[url.index(".") + 1:]
-        last = url.index("/")
-    except ValueError:
-        return url
-    return url[:last]
+    url = url[url.index(".") + 1:]
+    return secured_index(url, "/")
 
 
 def secured_index(url, index):
