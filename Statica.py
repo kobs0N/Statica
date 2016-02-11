@@ -112,7 +112,7 @@ def main():
     Helper.FileHandler = Helper.StoreFile(result['filename'])
 
     # Get Suspicious File List
-    main_scanner = Scanner(result.scannedTarget)
+    main_scanner = Scanner(result['scannedTarget'])
     files_to_scan = main_scanner.FileLists
     Threat.per.countAll = len(files_to_scan)
 
