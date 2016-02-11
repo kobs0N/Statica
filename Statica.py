@@ -3,12 +3,11 @@
 # Version 0.1
 
 # Imports
-import platform, os
+import platform, os, argparse
 import sys, time
 import Helper, Threat
 from datetime import datetime
 from Scanner import Scanner
-from optparse import OptionParser
 from Threat import Url, Xss, Comments
 from multiprocessing.dummy import Pool as ThreadPool
 import Spider
@@ -63,13 +62,14 @@ def print_summary(TimeStarted):
 
 
 def Menu():
-    options = OptionParser()
-    options.add_option("-f", "--filename", help="Save to file", dest="filename", metavar="FILE")
-    options.add_option("-u", "--url", action="store_true", help="Do online static analysis [Future Use]", default=False)
-    options.add_option("-c", "--comments", help="Save all comments into one file", dest="cfilepath")
-    (options, args) = options.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--filename", help="Save to file", dest="filename", metavar="FILE",default="results.statica")
+    parser.add_argument("-u", "--url", action="store_true",dest="url",help="Do online static analysis [Future Use]", default=False)
+    parser.add_argument("-c", "--comments", help="Save all comments into one file", dest="cfilepath",default="commentsFile.statica")
+    parser.add_argument("-t", "--target",help="Target folder or file to scan",dest="scannedTarget",type=str,required=True)
+    (options) = vars(parser.parse_args())
 
-    if options.url is True:
+    if options['url'] is True:
         print "Online Scanning not available"
         sys.exit(2)
 
@@ -103,20 +103,16 @@ def main():
     Threads = ThreadPool(10)
     GraphicInit()
     result = Menu()
-    if result.cfilepath is not "":
+    if result['cfilepath'] is not "":
         global cfile
-        cfile = open(result.cfilepath, 'w')
+        cfile = open(result['cfilepath'], 'w')
     else:
         cfile = None
 
-    if len(sys.argv) < 2:
-        print "Missing Argument: Statica.py folder_name"
-        sys.exit(0)
-
-    Helper.FileHandler = Helper.StoreFile(result.filename)
+    Helper.FileHandler = Helper.StoreFile(result['filename'])
 
     # Get Suspicious File List
-    main_scanner = Scanner(sys.argv[1])
+    main_scanner = Scanner(result.scannedTarget)
     files_to_scan = main_scanner.FileLists
     Threat.per.countAll = len(files_to_scan)
 
